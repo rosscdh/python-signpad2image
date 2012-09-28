@@ -30,7 +30,7 @@ def s2if(jsonsig, output_image="signature.png", input_image=BLANK_IMAGE,
     draw = ImageDraw.Draw(im)
     #iterate over our list of points and draw corresponding lines
     for i in l:
-        draw.line((i['lx'], i['ly'], i['mx'], i['my']), fill=pincolor, width=1)
+        draw.line((i['lx'], i['ly'], i['mx'], i['my']), fill=pincolor)
     #delete our draw object (cleanup and free the memory)
     del draw 
 
@@ -42,10 +42,8 @@ def s2if(jsonsig, output_image="signature.png", input_image=BLANK_IMAGE,
     return IMAGE_PATH
     
 
-def s2i(jsonsig, input_image=BLANK_IMAGE, pincolor=(0,0,255),
-        force_no_sig_image=False, nosig_image=NO_SIG_IMAGE):
-    
-      
+def s2i(jsonsig, input_image=BLANK_IMAGE, pincolor=(0,0,255), force_no_sig_image=False, nosig_image=NO_SIG_IMAGE):
+
     if force_no_sig_image==True:
         im = Image.open(nosig_image)
         return im
@@ -63,17 +61,45 @@ def s2i(jsonsig, input_image=BLANK_IMAGE, pincolor=(0,0,255),
     im = Image.open(input_image)
     #create a drawing object
     draw = ImageDraw.Draw(im)
+
     #iterate over our list of points and draw corresponding lines
     for i in l:
-        draw.line((i['lx'], i['ly'], i['mx'], i['my']), fill=pincolor, width=1)
+        draw.line([i['lx'],i['ly'],i['mx'],i['my']], fill=pincolor, width=1)
     #delete our draw object (cleanup and free the memory)
     del draw 
-    
+
     # save image
     #im.save(output_image, "PNG")
     return im
 
-    
+
+def s2ib(jsonsig, wh=(200,120), pincolor=(0,0,255)):
+    """ s2 Image Blank, generates an image from the JSON passed in but without a signature template """
+
+    im = Image.new('RGBA', wh)
+
+    if type(jsonsig) is not str:
+        return im
+    #Decode valid json or return None
+    try:
+        l=json.loads(jsonsig)
+    except(exceptions.ValueError):
+        return im
+    #Make sure its a signature or return None
+    if not l[0].has_key('lx') or not l[0].has_key('my'):
+        return im
+    #create a drawing object
+    draw = ImageDraw.Draw(im)
+
+    #iterate over our list of points and draw corresponding lines
+    for i in l:
+        draw.line([i['lx'],i['ly'],i['mx'],i['my']], fill=pincolor, width=1)
+    #delete our draw object (cleanup and free the memory)
+    del draw 
+
+    # save image
+    return im
+
 if __name__ == "__main__":
     
     try:
